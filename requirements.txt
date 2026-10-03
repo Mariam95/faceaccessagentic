@@ -1,0 +1,13 @@
+# Face models and API (original project)
+fastapi>=0.115,<1
+python-multipart>=0.0.20
+numpy>=1.26,<3
+opencv-contrib-python-headless>=4.10,<5
+Pillow>=10
+onnxruntime>=1.20
+uvicorn[standard]
+
+# Agentic pipeline + Streamlit app
+crewai[anthropic]==1.15.23
+streamlit>=1.40
+pandas
