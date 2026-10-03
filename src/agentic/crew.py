@@ -144,7 +144,7 @@ class AgentDecision(BaseModel):
 # speak the OpenAI API format, so they go through CrewAI's OpenAI client with their own URL.
 PROVIDERS = [
     # (key env var, label, default model, model override env var, base URL)
-    ("GROQ_API_KEY", "Groq", "llama-3.3-70b-versatile", "GROQ_MODEL", "https://api.groq.com/openai/v1"),
+    ("GROQ_API_KEY", "Groq", "openai/gpt-oss-120b", "GROQ_MODEL", "https://api.groq.com/openai/v1"),
     ("XAI_API_KEY", "Grok (xAI)", "grok-4.3", "XAI_MODEL", "https://api.x.ai/v1"),
     ("ANTHROPIC_API_KEY", "Claude", "claude-haiku-4-5-20251001", None, None),
     ("OPENAI_API_KEY", "OpenAI", "gpt-4o-mini", None, None),
@@ -161,7 +161,7 @@ def _llm_settings() -> Optional[dict]:
         if base_url:  # OpenAI-compatible provider (Groq, Grok)
             out = {"label": f"{label}: {model}", "model": f"openai/{model}", "base_url": base_url, "api_key": key}
             if key_env == "GROQ_API_KEY":
-                fb = os.getenv("GROQ_FALLBACK_MODEL", "llama-3.1-8b-instant").strip()
+                fb = os.getenv("GROQ_FALLBACK_MODEL", "openai/gpt-oss-20b").strip()
                 if fb and fb != model:
                     out["fallback_model"] = fb
             return out
@@ -221,7 +221,7 @@ def _kickoff(case: AccessCase, llm_kwargs: dict, challenges_left: int):
         goal="Decide whether to open the door for the person in the photos, or what they must do to prove they are real.",
         backstory=BACKSTORY,
         tools=[inspect_face, verify_head_turn, check_access_history],
-        llm=LLM(temperature=0, max_tokens=600, **llm_kwargs),
+        llm=LLM(temperature=0, max_tokens=2000, **llm_kwargs),  # room for the model's reasoning
         allow_delegation=False,
         max_iter=6,
         max_execution_time=config.AGENT_TIMEOUT_SECONDS,
